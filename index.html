@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crazy Town Coffee</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      window.addEventListener("load", () => {
+        document.getElementById("loader").style.display = "none";
+      });
+    </script>
+    <script
+      src="https://maps.app.goo.gl/eQXhgDXcwocYdwgNA"
+      async
+      defer
+    ></script>
+  </head>
+  <body>
+    <div id="loader"><div class="spinner"></div></div>
+    <header>
+      <h1>Crazy Town Coffee</h1>
+      <nav>
+        <a href="#about">Tentang</a>
+        <a href="#menu">Menu</a>
+        <a href="#order">Pesan</a>
+        <a href="#contact">Kontak</a>
+      </nav>
+    </header>
+
+    <section id="about" class="text-center">
+      <h2>Selamat datang di Crazy Town Coffee</h2>
+      <img src="logo.jpg" alt="Crazy Town Coffee" class="section-img" />
+      <p>
+        Kami adalah kedai kopi minimalis dengan rasa yang luar biasa. Temukan
+        kenikmatan kopi terbaik dari biji pilihan di tangan para barista terbaik
+        kami.
+      </p>
+    </section>
+
+    <section id="menu">
+      <h2 class="text-center">Menu Kami</h2>
+      <div class="slider">
+        <img src="americano2.jpg" alt="Americano" />
+        <img src="latte.jpg" alt="Latte" />
+        <img src="kopi susu.jpg" alt="Kopi Susu" />
+      </div>
+      <div class="menu-grid">
+        <div class="menu-item">
+          <h3>Americano Robusta Temanggung</h3>
+          <p>Rp10.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Hazelnut Latte Robusta</h3>
+          <p>Rp14.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Vanila Latte Robusta</h3>
+          <p>Rp14.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Tiramisu Latte Robusta</h3>
+          <p>Rp14.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Kopi Susu Gula Aren</h3>
+          <p>Rp12.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Americano Arabica Toraja</h3>
+          <p>Rp11.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Hazelnut Latte Arabica</h3>
+          <p>Rp13.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Vanila Latte Arabica</h3>
+          <p>Rp13.000</p>
+        </div>
+        <div class="menu-item">
+          <h3>Tiramisu Latte Arabica</h3>
+          <p>Rp13.000</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="order">
+      <h2 class="text-center">Formulir Pemesanan</h2>
+      <form id="orderForm">
+        <input type="text" id="nama" placeholder="Nama Anda" required />
+        <input
+          type="text"
+          id="whatsapp"
+          placeholder="Nomor WhatsApp"
+          required
+        />
+        <input
+          type="text"
+          id="alamat"
+          placeholder="Alamat Lengkap Anda"
+          required
+        />
+        <p id="estimasi">Estimasi ongkir akan muncul di sini...</p>
+        <input type="hidden" id="ongkir" />
+        <select id="menu" required>
+          <option value="">-- Pilih Menu --</option>
+          <option>Americano Robusta Temanggung</option>
+          <option>Hazelnut Latte Robusta</option>
+          <option>Vanila Latte Robusta</option>
+          <option>Tiramisu Latte Robusta</option>
+          <option>Kopi Susu Gula Aren</option>
+          <option>Americano Arabica Toraja</option>
+          <option>Hazelnut Latte Arabica</option>
+          <option>Vanila Latte Arabica</option>
+          <option>Tiramisu Latte Arabica</option>
+        </select>
+        <textarea id="catatan" placeholder="Catatan Tambahan"></textarea>
+        <button type="submit">Pesan Sekarang</button>
+      </form>
+      <script>
+        const toko = "Crazy Town Coffee, Bekasi"; // alamat asal tetap
+        const hargaPerKm = 5000;
+
+        function hitungEstimasiOngkir() {
+          const alamat = document.getElementById("alamat").value;
+          if (!alamat) return;
+
+          const service = new google.maps.DistanceMatrixService();
+          service.getDistanceMatrix(
+            {
+              origins: [alamat],
+              destinations: [toko],
+              travelMode: google.maps.TravelMode.DRIVING,
+              unitSystem: google.maps.UnitSystem.METRIC,
+            },
+            function (response, status) {
+              if (status !== "OK") {
+                document.getElementById("estimasi").innerText =
+                  "Gagal menghitung ongkir.";
+                return;
+              }
+
+              const result = response.rows[0].elements[0];
+              if (result.status === "OK") {
+                const jarakText = result.distance.text; // e.g. "6.3 km"
+                const jarakValue = result.distance.value / 1000; // in km
+                const ongkir = Math.ceil(jarakValue * hargaPerKm);
+
+                document.getElementById(
+                  "estimasi"
+                ).innerText = `Jarak: ${jarakText}, Estimasi Ongkir: Rp${ongkir.toLocaleString()}`;
+                document.getElementById("ongkir").value = ongkir;
+              } else {
+                document.getElementById("estimasi").innerText =
+                  "Alamat tidak ditemukan.";
+              }
+            }
+          );
+        }
+
+        document
+          .getElementById("alamat")
+          .addEventListener("change", hitungEstimasiOngkir);
+      </script>
+      <script>
+        function initAutocomplete() {
+          const input = document.getElementById("alamat");
+          new google.maps.places.Autocomplete(input, {
+            componentRestrictions: { country: "id" },
+          });
+        }
+
+        // Panggil saat API selesai dimuat
+        window.initAutocomplete = initAutocomplete;
+      </script>
+      <script>
+        document
+          .getElementById("orderForm")
+          .addEventListener("submit", function (e) {
+            e.preventDefault();
+            const nama = document.getElementById("nama").value;
+            const whatsapp = document.getElementById("whatsapp").value;
+            const menu = document.getElementById("menu").value;
+            const alamat = document.getElementById("alamat").value;
+            const ongkir = document.getElementById("ongkir").value || 0;
+            const catatan = document.getElementById("catatan").value;
+
+            const pesan = `Halo, saya ingin memesan:\nNama: ${nama}\nNo. WA: ${whatsapp}\nMenu: ${menu}\nAlamat: ${alamat}\nOngkir Estimasi: Rp${Number(
+              ongkir
+            ).toLocaleString()}\nCatatan: ${catatan}`;
+            const url = `https://wa.me/6285695034937?text=${encodeURIComponent(
+              pesan
+            )}`;
+            window.open(url, "_blank");
+          });
+      </script>
+    </section>
+
+    <section id="contact" style="background-color: #fff7ed">
+      <h2 class="text-center">Hubungi Kami</h2>
+      <div class="text-center">
+        <p>Ikuti kami di Instagram:</p>
+        <a
+          class="wa-button"
+          href="https://instagram.com/crazy_town2025"
+          target="_blank"
+          >Kunjungi Instagram</a
+        >
+      </div>
+    </section>
+
+    <footer>
+      <p>&copy; 2025 Crazy Town Coffee.</p>
+    </footer>
+  </body>
+</html>
